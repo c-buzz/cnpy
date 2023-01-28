@@ -8,6 +8,7 @@ project(CNPY)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 option(ENABLE_STATIC "Build static (.a) library" ON)
+set (CMAKE_DEBUG_POSTFIX d)
 
 find_package(ZLIB REQUIRED)
 
@@ -17,9 +18,18 @@ add_library(cnpy SHARED "cnpy.cpp")
 target_link_libraries(cnpy ${ZLIB_LIBRARIES})
 install(TARGETS "cnpy" LIBRARY DESTINATION lib PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
+
+if (msvc)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif (msvc)
+
 if(ENABLE_STATIC)
     add_library(cnpy-static STATIC "cnpy.cpp")
-    set_target_properties(cnpy-static PROPERTIES OUTPUT_NAME "cnpy")
+    if (msvc)
+        set_target_properties(cnpy-static PROPERTIES OUTPUT_NAME "cnpystatic")
+    else()
+        set_target_properties(cnpy-static PROPERTIES OUTPUT_NAME "cnpy")
+    endif()
     install(TARGETS "cnpy-static" ARCHIVE DESTINATION lib)
 endif(ENABLE_STATIC)
 
